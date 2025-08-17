@@ -38,22 +38,6 @@ class NumberTriviaRepositoryImpl implements NumberTriviaRepository {
           );
           await localDataSource.cacheNumberTrivia(trivia);
         }
-        // NumberTriviaModel? n;
-        // // Cache if successful
-        // if (remoteTrivia.isRight()) {
-        //   //  var x = right(remoteTrivia);
-        //   //   await localDataSource.cacheNumberTrivia(x)
-        //   remoteTrivia.fold(
-        //     (failure) => null, // Do nothing on failure
-        //     (trivia) {
-        //       n = trivia;
-        //     },
-        //   );
-        // }
-
-        // if (n != null) {
-        //   await localDataSource.cacheNumberTrivia(n!);
-        // }
         return remoteTrivia;
       } on ServerException {
         // return left(ServerFailure());
@@ -75,10 +59,33 @@ class NumberTriviaRepositoryImpl implements NumberTriviaRepository {
 
   @override
   Future<Either<Failure, NumberTrivia>> getRandomNumberTrivia() async {
-    try {
-      return Right(NumberTrivia(text: "", number: 1));
-    } catch (e) {
-      return Left(CacheFailuere());
+    bool isConnected = await networkInfo.isConnected;
+    if (isConnected) {
+      try {
+        final remoteTrivia = await remoteDataSource.getRandomNumberTrivia();
+
+        if (remoteTrivia.isRight()) {
+          final trivia = remoteTrivia.getOrElse(
+            () => throw Exception("Should not happen"),
+          );
+          await localDataSource.cacheNumberTrivia(trivia);
+        }
+        return remoteTrivia;
+      } on ServerException {
+        // return left(ServerFailure());
+        return Left(ServerFailure());
+      } catch (e) {
+        return Left(ServerFailure());
+      }
+    } else {
+      try {
+        final localTrivia = await localDataSource.getLastNumberTrivia();
+        return Right(localTrivia);
+      } on CacheException {
+        return Left(CacheFailuere());
+      } catch (e) {
+        return Left(CacheFailuere());
+      }
     }
   }
 }
