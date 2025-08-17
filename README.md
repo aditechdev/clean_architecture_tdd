@@ -47,28 +47,6 @@ lib/
 └── main.dart
 ```
 
-## ** To Add the Screenshot:**
-
-1. **Make sure the screenshot exists** at `/Users/adityaanand/Developer/flutter_project/clean_architecture_tdd/screenshots/image.png`
-
-2. **Create the screenshots directory** if it doesn't exist:
-   ```bash
-   mkdir -p screenshots
-   ```
-
-3. **Copy your screenshot** to that location
-
-4. **The README will automatically display** the screenshot when viewed on GitHub/GitLab
-
-## ** Benefits of Adding the Screenshot:**
-
-- **Visual proof** of your test coverage
-- **Professional appearance** for your project
-- **Easy understanding** of what the project achieves
-- **Documentation** of your testing success
-
-The screenshot will be displayed inline in your README, making it easy for other developers to see your test coverage results at a glance! 📊✨
-
 ## Testing
 
 Run the tests with coverage:
