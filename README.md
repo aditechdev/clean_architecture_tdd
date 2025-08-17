@@ -4,7 +4,7 @@ A Flutter project implementing Clean Architecture with Test-Driven Development (
 
 ## Screenshots
 
-![Test Coverage Report](screenshots/image.png)
+<img src="screenshots/image.png" width="600" alt="Test Coverage Report" />
 
 *Test coverage report showing comprehensive unit test results*
 
