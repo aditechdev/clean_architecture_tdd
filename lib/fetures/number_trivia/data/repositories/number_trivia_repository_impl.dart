@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:clean_architecture_tdd/core/error/exceptions.dart';
 import 'package:clean_architecture_tdd/core/error/failures.dart';
 import 'package:clean_architecture_tdd/core/paltform/network_info.dart';
@@ -25,44 +23,23 @@ class NumberTriviaRepositoryImpl implements NumberTriviaRepository {
   Future<Either<Failure, NumberTrivia>> getConcreteNumberTrivia(
     int number,
   ) async {
-    bool isConnected = await networkInfo.isConnected;
-    if (isConnected) {
-      try {
-        final remoteTrivia = await remoteDataSource.getConcreteNumberTrivia(
-          number,
-        );
-
-        if (remoteTrivia.isRight()) {
-          final trivia = remoteTrivia.getOrElse(
-            () => throw Exception("Should not happen"),
-          );
-          await localDataSource.cacheNumberTrivia(trivia);
-        }
-        return remoteTrivia;
-      } on ServerException {
-        // return left(ServerFailure());
-        return Left(ServerFailure());
-      } catch (e) {
-        return Left(ServerFailure());
-      }
-    } else {
-      try {
-        final localTrivia = await localDataSource.getLastNumberTrivia();
-        return Right(localTrivia);
-      } on CacheException {
-        return Left(CacheFailuere());
-      } catch (e) {
-        return Left(CacheFailuere());
-      }
-    }
+    return await _getTrivia(
+      () => remoteDataSource.getConcreteNumberTrivia(number),
+    );
   }
 
   @override
   Future<Either<Failure, NumberTrivia>> getRandomNumberTrivia() async {
+    return await _getTrivia(() => remoteDataSource.getRandomNumberTrivia());
+  }
+
+  Future<Either<Failure, NumberTrivia>> _getTrivia(
+    Future<Either<Failure, NumberTriviaModel>> Function() getConcreateOrRandom,
+  ) async {
     bool isConnected = await networkInfo.isConnected;
     if (isConnected) {
       try {
-        final remoteTrivia = await remoteDataSource.getRandomNumberTrivia();
+        final remoteTrivia = await getConcreateOrRandom();
 
         if (remoteTrivia.isRight()) {
           final trivia = remoteTrivia.getOrElse(
