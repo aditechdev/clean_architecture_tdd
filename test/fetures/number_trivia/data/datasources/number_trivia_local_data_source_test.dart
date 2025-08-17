@@ -39,19 +39,36 @@ void main() {
       expect(result, equals(tNumberTriviaModel));
     });
 
-
     test('should throw cached exception when there is not a value', () {
       // arrange
+      when(() => mockSharedPrefrences.getString(any())).thenReturn(null);
+
+      final call = dataSourceImpl.getLastNumberTrivia;
+
+      //act & assert
+      expect(() => call(), throwsA(TypeMatcher<CacheException>()));
+      // verify(() => mockSharedPrefrences.getString(CACHED_NUMBER_TRIVIA));
+    });
+  });
+
+  group('cachedNumberTrivia', () {
+    final tNumberTriviaModel = NumberTriviaModel(
+      text: 'test trivia',
+      number: 1,
+    );
+
+    test('should call sharedPreferance to cache the data', () async {
+      // arrange
+      final expectedJsonString = jsonEncode(tNumberTriviaModel.toJson());
       when(
-        () => mockSharedPrefrences.getString(any()),
-      ).thenReturn(null);
+        () => mockSharedPrefrences.setString(any(), any()),
+      ).thenAnswer((_) async => true);
+
       // act
-      final call =  dataSourceImpl.getLastNumberTrivia;
+      await dataSourceImpl.cacheNumberTrivia(tNumberTriviaModel);
 
       //assert
-      expect(()=>call(), throwsA(TypeMatcher<CacheException>()));
-      // verify(() => mockSharedPrefrences.getString(CACHED_NUMBER_TRIVIA));
-
+      verify(() => mockSharedPrefrences.setString(any(), expectedJsonString));
     });
   });
 }

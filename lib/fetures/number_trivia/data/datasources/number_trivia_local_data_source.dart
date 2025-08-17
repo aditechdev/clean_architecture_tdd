@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:clean_architecture_tdd/core/error/exceptions.dart';
@@ -23,9 +22,11 @@ class NumberTriviaLocalDataSourceImpl implements NumberTriviaLocalDataSource {
   NumberTriviaLocalDataSourceImpl({required this.sharedPreferences});
 
   @override
-  Future<void> cacheNumberTrivia(NumberTriviaModel triviaToCache) {
-    // TODO: implement cacheNumberTrivia
-    throw UnimplementedError();
+  Future<void> cacheNumberTrivia(NumberTriviaModel triviaToCache) async {
+    await sharedPreferences.setString(
+      CACHED_NUMBER_TRIVIA,
+      jsonEncode(triviaToCache.toJson()),
+    );
   }
 
   @override
